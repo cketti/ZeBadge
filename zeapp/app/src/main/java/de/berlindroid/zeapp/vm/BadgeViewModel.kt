@@ -282,6 +282,18 @@ class BadgeViewModel(
         }
     }
 
+    fun flashLights() {
+        viewModelScope.launch {
+            badge.flashLights(getApplication<Application>().applicationContext, true)
+            delay(1000)
+            badge.flashLights(getApplication<Application>().applicationContext, false)
+        }
+    }
+
+    fun chaseLights() {
+        badge.chaseLights(getApplication<Application>().applicationContext)
+    }
+
     /**
      * Configure the given slot
      *

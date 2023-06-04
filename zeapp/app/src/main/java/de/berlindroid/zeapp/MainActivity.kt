@@ -1,4 +1,7 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
+@file:OptIn(
+    ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class,
+    ExperimentalFoundationApi::class
+)
 
 package de.berlindroid.zeapp
 
@@ -10,8 +13,10 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -26,6 +31,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.AlertDialog
@@ -113,9 +120,15 @@ private fun ZeTopBar(vm: BadgeViewModel) {
     TopAppBar(
         title = { Text(stringResource(id = R.string.app_name)) },
         actions = {
-            IconButton(onClick = { vm.saveAll() }) {
+            IconButton(onClick = { vm.flashLights() }) {
                 Icon(
-                    painter = painterResource(id = R.drawable.save_all),
+                    imageVector = Icons.Filled.Notifications,
+                    contentDescription = null
+                )
+            }
+            IconButton(onClick = { vm.chaseLights() }) {
+                Icon(
+                    imageVector = Icons.Filled.LocationOn,
                     contentDescription = null
                 )
             }

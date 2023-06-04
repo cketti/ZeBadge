@@ -25,6 +25,7 @@ import time
 import traceback
 import usb_cdc
 import zlib
+import neopixel
 from digitalio import DigitalInOut, Direction, Pull
 
 # Configuration
@@ -37,6 +38,9 @@ KEEP_ALIVE = 5  # seconds
 REFRESH_RATE = 3  # seconds
 DEBOUNCE_TIME = 2  # seconds
 
+pixels = neopixel.NeoPixel(board.SCL, 15, brightness=0.1)
+pixels.fill((0, 0, 0))
+
 COMMANDS = [
     "reload",
     "exit",
@@ -45,6 +49,11 @@ COMMANDS = [
     "terminal",
     "preview",
     "refresh",
+
+    "light_green",
+    "light_flash_on",
+    "light_flash_off",
+    "light_chase",
 
     "store-a",
     "store-b",
@@ -64,9 +73,13 @@ COMMAND_NONE = [None, None, None]
 # Debug logging
 def log(string):
     if DEBUG:
-        with open("log.txt", "a") as file:
-            file.write(string)
-            file.write("\n")
+        try:
+            with open("log.txt", "a") as file:
+                file.write(string)
+                file.write("\n")
+        except OSError as e:
+            print("X ", end='')
+
         print(string)
 
 
@@ -240,9 +253,12 @@ def parse_command(base64_string):
 
 # Handle commands in format Base64<command:metadata:payload>
 def handle_commands():
+    global pixels, iteration
+
     command_raw = read_command_cdc()
     if command_raw is None:
-        print("Command is empty, ignore")
+        print(".", end='')
+
     command_name, metadata, payload = parse_command(command_raw)
     if command_name is None:
         return
@@ -267,6 +283,20 @@ def handle_commands():
     elif command_name.startswith("store"):
         page = command_name.split("-")[1]
         handle_store_command(page, metadata, payload)
+    elif command_name.startswith("light_green"):
+        pixels.fill((255, 0, 0))
+        time.sleep(1)
+        pixels.fill((0, 0, 0))
+    elif command_name.startswith("light_flash_on"):
+        pixels.fill((255, 255, 255))
+    elif command_name.startswith("light_flash_off"):
+        pixels.fill((0, 0, 0))
+    elif command_name.startswith("light_chase"):
+        for x in range(15):
+            pixels.fill((0, 0, 0))
+            pixels[x] = (255, 255, 0)
+            time.sleep(0.1)
+
     else:
         log("Command not implemented yet!")
 

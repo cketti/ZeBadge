@@ -68,6 +68,26 @@ class Badge(
         sendToUsb(context, payload)
     }
 
+    fun flashLights(context: Context, on: Boolean) {
+        val payload = Payload(
+            type = "light_flash_${if (on) "on" else "off"}",
+            meta = "",
+            payload = ""
+        )
+
+        sendToUsb(context, payload)
+    }
+
+    fun chaseLights(context: Context) {
+        val payload = Payload(
+            type = "light_chase",
+            meta = "",
+            payload = ""
+        )
+
+        sendToUsb(context, payload)
+    }
+
     private fun sendToUsb(context: Context, payload: Payload) {
         val manager = context.getSystemService(Context.USB_SERVICE) as UsbManager
         val device = manager.findConnectedBadge()
