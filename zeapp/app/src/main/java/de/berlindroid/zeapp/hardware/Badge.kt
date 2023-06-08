@@ -18,6 +18,8 @@ import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.Base64
 import java.util.zip.Deflater
+import kotlin.math.max
+import kotlin.math.min
 
 
 private const val ACTION_USB_PERMISSION = "ACTION_USB_PERMISSION"
@@ -70,19 +72,29 @@ class Badge(
 
     fun flashLights(context: Context, on: Boolean) {
         val payload = Payload(
-            type = "light_flash_${if (on) "on" else "off"}",
-            meta = "",
-            payload = ""
+            type = "light",
+            meta = "flash",
+            payload = if (on) "on" else "off"
         )
 
         sendToUsb(context, payload)
     }
 
-    fun chaseLights(context: Context) {
+    fun brightness(context: Context, percentage: Int) {
         val payload = Payload(
-            type = "light_chase",
-            meta = "",
-            payload = ""
+            type = "light",
+            meta = "brightness",
+            payload = min(100, max(0, percentage)).toString()
+        )
+
+        sendToUsb(context, payload)
+    }
+
+    fun chaseLights(context: Context, color: String) {
+        val payload = Payload(
+            type = "light",
+            meta = "chase",
+            payload = color
         )
 
         sendToUsb(context, payload)

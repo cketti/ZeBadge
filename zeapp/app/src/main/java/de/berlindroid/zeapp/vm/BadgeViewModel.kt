@@ -7,10 +7,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.runtime.currentCompositionLocalContext
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.platform.ClipboardManager
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import de.berlindroid.zeapp.OPENAI_API_KEY
@@ -282,16 +279,20 @@ class BadgeViewModel(
         }
     }
 
+    var lightsOn = false
     fun flashLights() {
-        viewModelScope.launch {
-            badge.flashLights(getApplication<Application>().applicationContext, true)
-            delay(1000)
-            badge.flashLights(getApplication<Application>().applicationContext, false)
-        }
+        badge.flashLights(getApplication<Application>().applicationContext, lightsOn)
+        lightsOn = !lightsOn
     }
 
     fun chaseLights() {
-        badge.chaseLights(getApplication<Application>().applicationContext)
+        val color = listOf("red", "green", "blue").random()
+        badge.chaseLights(getApplication<Application>().applicationContext, color)
+    }
+
+    fun brightness() {
+        val brightness = (Math.random() * 100).toInt()
+        badge.brightness(getApplication<Application>().applicationContext, brightness)
     }
 
     /**

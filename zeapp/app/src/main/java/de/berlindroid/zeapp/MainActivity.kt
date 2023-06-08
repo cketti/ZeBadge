@@ -132,6 +132,12 @@ private fun ZeTopBar(vm: BadgeViewModel) {
                     contentDescription = null
                 )
             }
+            IconButton(onClick = { vm.brightness() }) {
+                Icon(
+                    imageVector = Icons.Filled.LocationOn,
+                    contentDescription = null
+                )
+            }
         }
     )
 }

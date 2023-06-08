@@ -50,10 +50,7 @@ COMMANDS = [
     "preview",
     "refresh",
 
-    "light_green",
-    "light_flash_on",
-    "light_flash_off",
-    "light_chase",
+    "light",
 
     "store-a",
     "store-b",
@@ -283,22 +280,38 @@ def handle_commands():
     elif command_name.startswith("store"):
         page = command_name.split("-")[1]
         handle_store_command(page, metadata, payload)
-    elif command_name.startswith("light_green"):
-        pixels.fill((255, 0, 0))
-        time.sleep(1)
-        pixels.fill((0, 0, 0))
-    elif command_name.startswith("light_flash_on"):
-        pixels.fill((255, 255, 255))
-    elif command_name.startswith("light_flash_off"):
-        pixels.fill((0, 0, 0))
-    elif command_name.startswith("light_chase"):
-        for x in range(15):
-            pixels.fill((0, 0, 0))
-            pixels[x] = (255, 255, 0)
-            time.sleep(0.1)
+    elif command_name.startswith("light"):
+        handle_light(metadata, payload, pixels)
 
     else:
         log("Command not implemented yet!")
+
+
+def handle_light(metadata, payload, pixels):
+    if metadata.lower().startswith("flash"):
+        if payload.lower() == 'on':
+            pixels.fill((255, 255, 255))
+        else:
+            pixels.fill((0, 0, 0))
+
+    elif metadata.lower().startswith("brightness"):
+        pixels.brightness = min(100, max(0, int(payload) / 100))
+
+    elif metadata.lower().startswith("chase"):
+        color = (255, 255, 255)
+        if payload.lower() == "red":
+            color = (255, 0, 0)
+        elif payload.lower() == "green":
+            color = (0, 255, 0)
+        elif payload.lower() == "blue":
+            color = (0, 0, 255)
+
+        for x in range(15):
+            pixels.fill((0, 0, 0))
+            pixels[x] = color
+            time.sleep(0.1)
+
+        pixels.fill((0, 0, 0))
 
 
 # For the refresh command
