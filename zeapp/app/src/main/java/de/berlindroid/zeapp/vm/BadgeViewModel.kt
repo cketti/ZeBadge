@@ -240,6 +240,8 @@ class BadgeViewModel(
         }
     )
 
+    val showBadgeSpecials = mutableStateOf(false)
+
     val slots = mutableStateOf(
         mutableMapOf(
             Slot.Name to initialConfiguration(Slot.Name),
@@ -279,19 +281,19 @@ class BadgeViewModel(
         }
     }
 
-    var lightsOn = false
-    fun flashLights() {
-        badge.flashLights(getApplication<Application>().applicationContext, lightsOn)
-        lightsOn = !lightsOn
+    fun badgeSpecialsSelected(value: Boolean) {
+        showBadgeSpecials.value = value
     }
 
-    fun chaseLights() {
-        val color = listOf("red", "green", "blue").random()
+    fun flashLights(lightsOn: Boolean) {
+        badge.flashLights(getApplication<Application>().applicationContext, lightsOn)
+    }
+
+    fun chaseLights(color: String) {
         badge.chaseLights(getApplication<Application>().applicationContext, color)
     }
 
-    fun brightness() {
-        val brightness = (Math.random() * 100).toInt()
+    fun brightness(brightness: Int) {
         badge.brightness(getApplication<Application>().applicationContext, brightness)
     }
 

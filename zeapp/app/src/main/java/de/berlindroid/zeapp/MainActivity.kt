@@ -101,13 +101,31 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     private fun ZeScreen() {
+        val editor by remember { vm.currentSlotEditor }
+        val templateChooser by remember { vm.currentTemplateChooser }
+        val showSpecials by remember { vm.showBadgeSpecials }
+
         ZeBadgeAppTheme(content = {
             Scaffold(
                 topBar = {
                     ZeTopBar(vm)
                 },
                 content = { paddingValues ->
-                    ZePages(this, paddingValues, vm)
+                    Column {
+                        if (editor != null) {
+                            SelectedEditor(editor!!, this@MainActivity, vm)
+                        }
+
+                        if (templateChooser != null) {
+                            TemplateChooserDialog(vm, templateChooser)
+                        }
+
+                        if (showSpecials) {
+                            BadgeSpecialsDialog(vm)
+                        }
+
+                        ZePages(paddingValues, vm)
+                    }
                 }
             )
         })
@@ -120,21 +138,11 @@ private fun ZeTopBar(vm: BadgeViewModel) {
     TopAppBar(
         title = { Text(stringResource(id = R.string.app_name)) },
         actions = {
-            IconButton(onClick = { vm.flashLights() }) {
+            IconButton(onClick = {
+                vm.badgeSpecialsSelected(true)
+            }) {
                 Icon(
                     imageVector = Icons.Filled.Notifications,
-                    contentDescription = null
-                )
-            }
-            IconButton(onClick = { vm.chaseLights() }) {
-                Icon(
-                    imageVector = Icons.Filled.LocationOn,
-                    contentDescription = null
-                )
-            }
-            IconButton(onClick = { vm.brightness() }) {
-                Icon(
-                    imageVector = Icons.Filled.LocationOn,
                     contentDescription = null
                 )
             }
@@ -144,25 +152,15 @@ private fun ZeTopBar(vm: BadgeViewModel) {
 
 
 @Composable
-private fun ZePages(activity: Activity, paddingValues: PaddingValues, vm: BadgeViewModel) {
+private fun ZePages(paddingValues: PaddingValues, vm: BadgeViewModel) {
     Surface(
         modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues)
             .padding(4.dp)
     ) {
-        val editor by remember { vm.currentSlotEditor }
-        val templateChooser by remember { vm.currentTemplateChooser }
         val message by remember { vm.message }
         val messageProgress by remember { vm.messageProgress }
-
-        if (editor != null) {
-            SelectedEditor(editor!!, activity, vm)
-        }
-
-        if (templateChooser != null) {
-            TemplateChooserDialog(vm, templateChooser)
-        }
 
         // column surrounding a lazycolumn: so the message stays ontop.
         Column {
@@ -337,6 +335,54 @@ private fun TemplateChooserDialog(
                         },
                     ) {
                         Text(text = config.humanTitle)
+                    }
+                }
+            }
+        }
+    )
+}
+
+@Composable
+private fun BadgeSpecialsDialog(
+    vm: BadgeViewModel,
+) {
+    val actions = mapOf(
+        "flash on" to { vm.flashLights(true) },
+        "flash off" to { vm.flashLights(false) },
+        "chase red" to { vm.chaseLights("red") },
+        "chase green" to { vm.chaseLights("green") },
+        "chase blue" to { vm.chaseLights("blue") },
+        "brightness 10%" to { vm.brightness(10) },
+        "brightness 25%" to { vm.brightness(25) },
+        "brightness 50%" to { vm.brightness(50) },
+        "brightness 75%" to { vm.brightness(75) },
+        "brightness 100%" to { vm.brightness(100) },
+    )
+
+    AlertDialog(
+        onDismissRequest = {
+            vm.badgeSpecialsSelected(false)
+        },
+        confirmButton = {
+            Button(onClick = {
+                vm.badgeSpecialsSelected(false)
+            }) {
+                Text(text = stringResource(id = android.R.string.ok))
+            }
+        },
+        title = {
+            Text(text = "Select Badge Special")
+        },
+        text = {
+            LazyColumn {
+                items(actions.keys.toList()) { key ->
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            actions.getValue(key).invoke()
+                        },
+                    ) {
+                        Text(text = key)
                     }
                 }
             }

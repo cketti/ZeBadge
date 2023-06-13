@@ -38,8 +38,10 @@ KEEP_ALIVE = 5  # seconds
 REFRESH_RATE = 3  # seconds
 DEBOUNCE_TIME = 2  # seconds
 
-pixels = neopixel.NeoPixel(board.SCL, 15, brightness=0.1)
-pixels.fill((0, 0, 0))
+pixels_left = neopixel.NeoPixel(board.SCL, 15, brightness=0.1)
+pixels_left.fill((0, 0, 0))
+pixels_right = neopixel.NeoPixel(board.SDA, 15, brightness=0.1)
+pixels_right.fill((0, 0, 0))
 
 COMMANDS = [
     "reload",
@@ -250,7 +252,7 @@ def parse_command(base64_string):
 
 # Handle commands in format Base64<command:metadata:payload>
 def handle_commands():
-    global pixels, iteration
+    global iteration
 
     command_raw = read_command_cdc()
     if command_raw is None:
@@ -281,21 +283,28 @@ def handle_commands():
         page = command_name.split("-")[1]
         handle_store_command(page, metadata, payload)
     elif command_name.startswith("light"):
-        handle_light(metadata, payload, pixels)
+        handle_light(metadata, payload)
 
     else:
         log("Command not implemented yet!")
 
 
-def handle_light(metadata, payload, pixels):
+def handle_light(metadata, payload):
+    global pixels_left, pixels_right
+    log(f"Light: {metadata} {payload}")
+
     if metadata.lower().startswith("flash"):
         if payload.lower() == 'on':
-            pixels.fill((255, 255, 255))
+            pixels_left.fill((255, 255, 255))
+            pixels_right.fill((255, 255, 255))
         else:
-            pixels.fill((0, 0, 0))
+            pixels_left.fill((0, 0, 0))
+            pixels_right.fill((0, 0, 0))
 
     elif metadata.lower().startswith("brightness"):
-        pixels.brightness = min(100, max(0, int(payload) / 100))
+        brightness_level = min(100, max(0, int(payload)))
+        pixels_left.brightness = brightness_level / 100
+        pixels_right.brightness = brightness_level / 100
 
     elif metadata.lower().startswith("chase"):
         color = (255, 255, 255)
@@ -306,12 +315,19 @@ def handle_light(metadata, payload, pixels):
         elif payload.lower() == "blue":
             color = (0, 0, 255)
 
-        for x in range(15):
-            pixels.fill((0, 0, 0))
-            pixels[x] = color
-            time.sleep(0.1)
+        for x in range(30):
+            pixels_left.fill((0, 0, 0))
+            pixels_right.fill((0, 0, 0))
 
-        pixels.fill((0, 0, 0))
+            if x < 15:
+                pixels_left[x] = color
+            else:
+                pixels_right[x - 15] = color
+
+            time.sleep(0.05)
+
+        pixels_left.fill((0, 0, 0))
+        pixels_right.fill((0, 0, 0))
 
 
 # For the refresh command

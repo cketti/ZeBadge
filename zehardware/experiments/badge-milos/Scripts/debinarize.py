@@ -11,14 +11,14 @@ input_file = sys.argv[2]
 output_file = sys.argv[4]
 
 with open(input_file, "rb") as file:
-    pixels = file.read()
+    pixels_left = file.read()
 
 # Let's pretend that we understand this
 image_width = 296
 image_height = 128
 image_size = (image_width, image_height)
 
-pixel_data = [255 if ((pixel >> i) & 1) else 0 for pixel in pixels for i in range(7, -1, -1)]
+pixel_data = [255 if ((pixel >> i) & 1) else 0 for pixel in pixels_left for i in range(7, -1, -1)]
 
 image = Image.new("L", image_size)
 image.putdata(pixel_data)

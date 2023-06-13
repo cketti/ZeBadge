@@ -12,9 +12,9 @@ output_file = sys.argv[4]
 
 image = Image.open(input_file)
 image_bw = image.convert("1")
-pixels = image_bw.tobytes()
+pixels_left = image_bw.tobytes()
 
 with open(output_file, "wb") as file:
-    file.write(pixels)
+    file.write(pixels_left)
 
 print("Done.")
