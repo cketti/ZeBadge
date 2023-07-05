@@ -8,11 +8,11 @@ android {
     compileSdk = 33
 
     defaultConfig {
-        applicationId "de.berlindroid.zeapp"
+        applicationId = "de.berlindroid.zeapp"
         minSdk = 29
         targetSdk = 33
         versionCode = 1
-        versionName =  "1.0"
+        versionName = "1.0"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -25,12 +25,19 @@ android {
 
     buildTypes {
         configureEach {
-            it.buildConfigField("String", "OPEN_API_TOKEN", "\"${System.getenv("DALE2_TOKEN")}\"" ?: "\"\"")
+            this.buildConfigField(
+                "String",
+                "OPEN_API_TOKEN",
+                "\"${System.getenv("DALE2_TOKEN")}\"" ?: "\"\""
+            )
         }
 
         release {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 
@@ -40,7 +47,7 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = "1.8"
     }
 
     buildFeatures {
@@ -50,10 +57,9 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.androidx.compose.compiler.get()
     }
-
-    packagingOptions {
+    packaging {
         resources {
-            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
 }
@@ -75,6 +81,6 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
-	testImplementation(libs.test.assertk)
-	testImplementation(libs.test.junit)
+    testImplementation(libs.test.assertk)
+    testImplementation(libs.test.junit)
 }
